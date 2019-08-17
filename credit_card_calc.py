@@ -1,78 +1,88 @@
-
-def check_gtin13_input(x):
-    if len(str(x)) > 13 or len(str(x)) < 12:
-        return 'Please enter a number with 12 or 13 digits.'
-    elif str.isdigit(str(x)):
+def check_card_input(card_no,check_no_entered):
+    if (check_no_entered is not 'y') and (check_no_entered is not 'n'):
+        return 'Please use the funciton like this: credit_card_calc( [credit card number, with or without the check number], [y/n to indicate if it includes the check number]'
+    elif len(str(card_no)) < 6 or len(str(card_no)) > 20:
+        return 'Please enter a credit card number, with or without the check number.'
+    elif str.isdigit(str(card_no)):
         return 'OK'
     else:
         return'Oops, looks like you entered some characters which aren\'t digits.'
         
 
 
-def gtin13_calc(x):
-    if check_gtin13_input(x) is not 'OK':
-        #stop the function
-        return check_gtin13_input(x)
+def credit_card_calc(card_no,check_no_entered):
+    #print(len(x))
+    #print(type(x))
+    #check if the user inputed the right functions
+    if check_card_input(card_no,check_no_entered) is not 'OK':
+        return check_card_input(card_no,check_no_entered)
+    
+    # convert the card number to a string or numbers.
+    card_no=[int(d) for d in str(card_no)]
 
-    # convert input to a list.
-    x=[int(a) for a in str(x)]
+    # Pull out the check number the user entered, if applicable.
+    if check_no_entered == 'y':
+        #extract the last digit entered
+        check_no_entered = (card_no[len(card_no)-1]) 
+        #remove the check digit from the card number
+        card_no = card_no[:len(card_no)-1]
 
     # Define variables for while loop
     sum = 0
     a=0
-    # Do the loop for all the didgets, excludinmg the check digit.
-    while a < 12:
+    # Do the loop for all the didgets, excluding the check digit.       
         # This method of checks is taken from https://en.wikipedia.org/wiki/Luhn_algorithm
-        # 1) From the rightmost digit, which is the check digit, and moving left, double the value of every second digit. The check digit is not doubled; the first digit doubled is immediately to the left of the check digit. If the result of this doubling operation is greater than 9 (e.g., 8 × 2 = 16), then add the digits of the result (e.g., 16: 1 + 6 = 7, 18: 1 + 8 = 9) or, alternatively, the same final result can be found by subtracting 9 from that result (e.g., 16: 16 − 9 = 7, 18: 18 − 9 = 9).
-        adding= (2*(a % 2)+1)*x[a]
+    while a  < (len(card_no) ) :
+        adding= (   (a+len(card_no)) % 2  + 1 ) * card_no[a]
+        if adding > 9:
+            adding = adding -9 
         sum += adding
         a = a + 1
-    
+
     check_no_calc = -sum % 10
-        
+    
+    if check_no_entered == 'n':
+        return 'The check number is '+ str(check_no_calc)
 
-        
-    #See if the check number was entered in by the user.  If so, tell them if the number is valid.
-    if len(x)  == 13:
-        check_no_entered = int(x[12])    
-        if  check_no_entered == check_no_calc:
-            return 'This is a valid gtin13 barcode.'
-        else:
-            return 'This is NOT a valid gtin13 barcode.'
+    if  check_no_entered == check_no_calc:
+        return 'This is a valid credit card number.'
+
+        #Here is a more fun, and arguably more correct, way of indicating the number is valid
+        #return 'This credit card number follows the maths rules, but to find out if it\'s valid please try it out by buying Hayley a coffee ;)'
     else:
-        return check_no_calc
+        return 'This is NOT a valid credit card number.'
 
 
-# create function of the same names has Hayley's
-def validate_gtin13_barcode_check_digit(x):
-    message = gtin13_calc(x)
-    return message
-def calculate_gtin13_barcode_check_digit(x):
-    return gtin13_calc(x)
+# create functions with similar names to Hayley's gtin13 barcode
+def validate_credit_card_check_digit(x):
+    return credit_card_calc(x,'y')
+def calculate_credit_card_check_digit(x):
+    return credit_card_calc(x,'n')
 
-# Other checks for the code with the other function names
-#This was to check by check funciton, lols.
-#print(check_gtin13_input(1234567890987))
-#print(check_gtin13_input('a'))
-#print(check_gtin13_input('12d333333333'))
 
-#Required to give 5
-#print(gtin13_calc('940055061977'))
+# Other checks with the old funciton names
+##Full valid credit card number
+#print(credit_card_calc('5499740000000057','y'))
 
-#Required to report is a valid GTIN 13 Barcode.
-#print(gtin13_calc('9781861972712'))
+##Full valid credit card number
+#print(credit_card_calc(371449635398431,'y'))
 
-# Not a valid GTIN 13 barcode
-#print(gtin13_calc(1234567890987))
+##Full valid credit card number which should have 1 as the check number
+#print(credit_card_calc(37144963539843,'n'))
 
-# Required to report that the input isn't all digits
-#print(gtin13_calc('A34567890987'))
+##Full valid credit card number, but with a bad user input
+#print(credit_card_calc('36438999960016','blank'))
 
-# Required to report that the input should be 12 or 13 digits long
-#print(gtin13_calc('A3456789098fffssd7'))
+##this should error
+#print(credit_card_calc('36d438999960016','y'))
 
-# Required to report that the input should be 12 or 13 digits long
-#print(gtin13_calc('A345'))
 
-print(validate_gtin13_barcode_check_digit('9400550619775'))
-print(calculate_gtin13_barcode_check_digit('940055061977'))
+#Checks with Hayley style functin names.
+#credit card number without check number which should have 1 as the check number.
+print(calculate_credit_card_check_digit('37144963539843'))
+
+##Full valid credit card number
+print(validate_credit_card_check_digit('371449635398431'))
+
+##Invalid credit card number
+print(validate_credit_card_check_digit('371449635398436'))
